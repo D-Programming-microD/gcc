@@ -14580,6 +14580,84 @@ $as_echo "$druntime_cv_atomic_long" >&6; }
 
 
 
+
+  ac_ext=d
+ac_compile='$GDC -c $GDCFLAGS conftest.$ac_ext >&5'
+ac_link='$GDC -o conftest$ac_exeext $GDCFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=yes
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking If gdc compiler uses emutls" >&5
+$as_echo_n "checking If gdc compiler uses emutls... " >&6; }
+    OS_EMUTLS=no
+    cat > conftest.$ac_ext <<_ACEOF
+
+      version (GNU_EMUTLS)
+          static assert(false);
+
+_ACEOF
+if ac_fn_d_try_compile "$LINENO"; then :
+
+        OS_EMUTLS=no
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+else
+
+        OS_EMUTLS=yes
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+  ac_ext=d
+ac_compile='$GDC -c $GDCFLAGS conftest.$ac_ext >&5'
+ac_link='$GDC -o conftest$ac_exeext $GDCFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=yes
+
+
+  if  test "x$OS_EMUTLS" == "xyes"; then :
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking If emutls supports GC hooks" >&5
+$as_echo_n "checking If emutls supports GC hooks... " >&6; }
+    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+void __emutls_iterate_memory (void *cb, void* user);
+int
+main ()
+{
+return 0;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        as_fn_error $? "emutls without GC hooks is not supported!" "$LINENO" 5
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+    ac_ext=d
+ac_compile='$GDC -c $GDCFLAGS conftest.$ac_ext >&5'
+ac_link='$GDC -o conftest$ac_exeext $GDCFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=yes
+
+
+fi
+
   ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -14878,67 +14956,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
   case "$druntime_cv_target_os" in
     mingw*)
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing socket" >&5
-$as_echo_n "checking for library containing socket... " >&6; }
-if ${ac_cv_search_socket+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char socket ();
-int
-main ()
-{
-return socket ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' ws2_32; do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_search_socket=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext
-  if ${ac_cv_search_socket+:} false; then :
-  break
-fi
-done
-if ${ac_cv_search_socket+:} false; then :
-
-else
-  ac_cv_search_socket=no
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_socket" >&5
-$as_echo "$ac_cv_search_socket" >&6; }
-ac_res=$ac_cv_search_socket
-if test "$ac_res" != no; then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-
-
-else
-
-        as_fn_error $? "Could not find socket library" "$LINENO" 5
-
-fi
-
+      LIBS="-lws2_32 $LIBS"
       ;;
   esac
 
